@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0e1013"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<title>Focus Timer</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<style>
+:root{--bg:#0e1013;--card:#181b21;--c2:#232832;--tx:#f4f6f8;--mu:#8b93a1;--ac:#2dd4bf;--wa:#fbbf24;--dg:#f87171;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{height:100%;margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,Roboto,sans-serif;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;user-select:none}
+#app{height:100%;display:flex;flex-direction:column}
+main{flex:1;overflow-y:auto;padding:16px 16px 8px}
+.scr{display:flex;flex-direction:column;gap:14px;min-height:100%;animation:in .25s ease}
+.scr[hidden]{display:none}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h1{font-size:15px;font-weight:600;color:var(--mu);margin:0;letter-spacing:.08em;text-transform:uppercase}
+.card{background:var(--card);border-radius:22px;padding:16px}
+.ringwrap{position:relative;width:min(76vw,300px);aspect-ratio:1;margin:4px auto}
+.ringwrap svg{width:100%;height:100%;transform:rotate(-90deg)}
+.trk{fill:none;stroke:var(--c2);stroke-width:9}
+.prg{fill:none;stroke:var(--ac);stroke-width:9;stroke-linecap:round;stroke-dasharray:628.3;transition:stroke-dashoffset .3s linear}
+.ctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.big{font-size:clamp(40px,14vw,60px);font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.sub{color:var(--mu);font-size:14px;margin-top:2px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.pre{background:var(--card);color:var(--tx);border:2px solid transparent;border-radius:18px;height:64px;font-size:22px;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05;transition:.15s}
+.pre small{font-size:11px;font-weight:500;color:var(--mu)}
+.pre.on{border-color:var(--ac);background:#0f2b29;color:var(--ac)}
+.pre:disabled{opacity:.45}
+.pre:active,.btn:active,.chip:active{transform:scale(.96)}
+.cust{display:flex;align-items:center;gap:8px;color:var(--mu);font-size:14px}
+.cust span:first-child{flex:1;font-weight:600;color:var(--tx)}
+input{background:var(--c2);border:0;border-radius:12px;color:var(--tx);font-size:17px;padding:12px;width:100%;outline:0;user-select:text}
+input:focus{box-shadow:0 0 0 2px var(--ac)}
+.cust input{width:58px;text-align:center;padding:10px 4px}
+.ctl{display:flex;gap:10px;margin-top:auto;flex-wrap:wrap}
+.btn{flex:1;min-width:0;height:60px;border:0;border-radius:30px;font-size:17px;font-weight:700;background:var(--c2);color:var(--tx);display:flex;align-items:center;justify-content:center;gap:8px;transition:.15s;white-space:nowrap;padding:0 16px}
+.btn svg{width:22px;height:22px;fill:currentColor}
+.btn.p{background:var(--ac);color:#04201d}
+.btn.w{background:var(--wa);color:#2b1d00}
+.btn.d{background:#3a1d1f;color:var(--dg)}
+.btn:disabled{opacity:.4}
+.full{flex-basis:100%}
+.sm{height:44px;flex:0 0 auto;font-size:14px;padding:0 16px}
+.chipx{display:inline-flex;align-items:center;gap:8px;align-self:center;background:var(--card);border-radius:20px;padding:8px 16px;font-size:14px;font-weight:600}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--mu)}
+.st-s .dot{background:var(--ac);animation:pl 1.4s infinite}.st-b .dot{background:var(--wa);animation:pl 1.4s infinite}
+@keyframes pl{50%{opacity:.3}}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.stats b{display:block;font-size:19px;font-variant-numeric:tabular-nums}
+.stats span,.lbl{font-size:12px;color:var(--mu)}
+.dash{display:flex;align-items:center;gap:16px}
+.dr{position:relative;width:104px;height:104px;flex:none}
+.dr svg{width:100%;height:100%;transform:rotate(-90deg)}
+.dr .trk,.dr .prg{stroke-width:9}.dr .prg{stroke-dasharray:276.5}
+.dr div{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px}
+.dd{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dd b{display:block;font-size:17px}
+.chips{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.chip{background:var(--c2);color:var(--tx);border:2px solid transparent;border-radius:16px;padding:10px 14px;font-size:15px;font-weight:600}
+.chip.on{border-color:var(--ac);color:var(--ac)}
+.row{display:flex;align-items:center;gap:10px;padding:12px 0;border-top:1px solid var(--c2)}
+.row:first-child{border-top:0}
+.row>div{flex:1;min-width:0}
+.row b{display:block;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row small{color:var(--mu);font-size:12px}
+.x{background:0;border:0;color:var(--mu);font-size:22px;width:40px;height:40px}
+nav{display:flex;background:var(--card);padding:6px 12px;gap:8px;border-top:1px solid var(--c2)}
+nav button{flex:1;height:58px;border:0;background:0;color:var(--mu);font-size:12px;font-weight:600;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border-radius:16px}
+nav svg{width:24px;height:24px;fill:currentColor}
+nav button.on{color:var(--ac);background:#0f2b29}
+#ov{position:fixed;inset:0;background:rgba(6,8,10,.94);z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:32px;text-align:center}
+#ov[hidden]{display:none}
+#ov h2{font-size:34px;margin:0}
+#ov .ic{width:96px;height:96px;border-radius:50%;background:var(--ac);display:flex;align-items:center;justify-content:center;animation:pl 1s infinite}
+#ov .ic svg{width:48px;height:48px;fill:#04201d}
+#toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 12px);transform:translate(-50%,-80px);background:var(--c2);padding:12px 18px;border-radius:20px;font-size:14px;font-weight:600;z-index:30;transition:.3s}
+#toast.on{transform:translate(-50%,0)}
+.hd{display:flex;justify-content:space-between;align-items:center}
+.fsb{background:var(--card);border:0;color:var(--tx);width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center}
+.fsb svg{width:22px;height:22px;fill:currentColor}
+#fs{position:fixed;inset:0;background:#000;z-index:15;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+#fs[hidden]{display:none}
+#fst{font-size:min(23vw,50vh);font-weight:700;font-variant-numeric:tabular-nums;line-height:1;white-space:nowrap}
+#fst.h{font-size:min(15vw,40vh)}
+#fst i{font-style:normal;animation:bl 1s steps(1) infinite}
+#fs:not(.run) #fst i{animation:none}
+@keyframes bl{50%{opacity:.15}}
+#fsl{margin-top:2vh;font-size:clamp(16px,4.5vmin,28px);color:var(--mu);font-weight:600;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:10px}
+#fsl:before{content:'';width:10px;height:10px;border-radius:50%;background:var(--mu)}
+#fs.run #fsl:before{background:var(--ac);animation:pl 1.2s infinite}
+#fsb{position:absolute;left:0;right:0;bottom:0;height:6px;background:#161a1f}
+#fsp{height:100%;width:0;background:var(--ac);transition:width .3s linear}
+#fsc{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 28px);display:flex;gap:10px;width:min(92vw,460px);opacity:0;transition:opacity .3s}
+#fs.show #fsc{opacity:1}
+#fs:not(.show) #fsc{pointer-events:none}
+#fsc .btn{height:56px}
+.fsr{--d:min(94vw,82vh);position:relative;width:var(--d);height:var(--d)}
+.fsr svg{width:100%;height:100%;transform:rotate(-90deg)}
+.fsr .trk,.fsr .prg{stroke-width:7}
+.fsr .ctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+#fs .fsr #fst{font-size:calc(var(--d)*.3);color:#fff;letter-spacing:-.02em;font-weight:600}
+#fs .fsr #fst.h{font-size:calc(var(--d)*.19)}
+#fs .fsr #fsl{margin-top:calc(var(--d)*.03);font-size:calc(var(--d)*.045)}
+#an{position:fixed;inset:0;z-index:12;background:rgba(0,0,0,.6);display:flex;align-items:flex-end}
+#an[hidden]{display:none}
+.sh{background:var(--bg);width:100%;max-height:92%;overflow-y:auto;border-radius:26px 26px 0 0;padding:18px 16px calc(env(safe-area-inset-bottom,0px) + 18px);animation:up .25s ease}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
+.tl{display:flex;height:18px;border-radius:9px;overflow:hidden;background:var(--c2);gap:2px}
+.tl i{display:block;height:100%}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kv>div{background:var(--card);border-radius:16px;padding:12px}
+.kv b{display:block;font-size:19px;margin-top:2px;font-variant-numeric:tabular-nums}
+.kv span{font-size:12px;color:var(--mu)}
+.bar{height:8px;border-radius:4px;background:var(--c2);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ac);border-radius:4px}
+</style></head>
+<body><div id="app">
+<main>
+<section id="t" class="scr">
+ <div class="hd"><h1>Countdown</h1><button class="fsb" data-a="fs" aria-label="Full screen"><svg viewBox="0 0 24 24"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg></button></div>
+ <div class="ringwrap"><svg viewBox="0 0 220 220"><circle class="trk" cx="110" cy="110" r="100"/><circle id="cr" class="prg" cx="110" cy="110" r="100"/></svg>
+ <div class="ctr"><div id="ct" class="big">30:00</div><div id="cs" class="sub">Ready</div></div></div>
+ <div id="pg" class="grid"></div>
+ <div class="card cust"><span>Custom</span><input id="ch" type="number" inputmode="numeric" min="0" max="23" placeholder="0"><span>h</span><input id="cm" type="number" inputmode="numeric" min="0" max="59" placeholder="30"><span>min</span><button class="btn p sm" data-a="cset">Set</button></div>
+ <div id="cc" class="ctl"></div>
+</section>
+<section id="s" class="scr" hidden>
+ <div class="hd"><h1>Study tracker</h1><button class="fsb" data-a="fs" aria-label="Full screen"><svg viewBox="0 0 24 24"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg></button></div>
+ <div id="chip" class="chipx"><i class="dot"></i><span>Ready</span></div>
+ <div class="ringwrap" style="aspect-ratio:auto;width:100%;margin:0;text-align:center"><div id="sf" class="big" style="font-size:clamp(48px,17vw,76px)">00:00</div><div class="sub">Focused study time</div></div>
+ <div class="card stats"><div><b id="stt">00:00</b><span>Session total</span></div><div><b id="sff">00:00</b><span>Focused</span></div><div><b id="sb">00:00</b><span>Break</span></div></div>
+ <input id="subj" list="subs" placeholder="Subject or activity (optional)" maxlength="40" autocomplete="off">
+ <datalist id="subs"><option value="Quantitative Aptitude"><option value="Reasoning"><option value="English"><option value="General Awareness"><option value="Other"></datalist>
+ <div id="sc" class="ctl" style="margin-top:0"></div>
+ <h1 style="margin-top:8px">Today</h1>
+ <div class="card"><div class="dash"><div class="dr"><svg viewBox="0 0 100 100"><circle class="trk" cx="50" cy="50" r="44"/><circle id="dring" class="prg" cx="50" cy="50" r="44"/></svg><div id="dpct">0%</div></div>
+ <div class="dd"><div><span class="lbl">Focused</span><b id="df">0h 0m</b></div><div><span class="lbl">Remaining</span><b id="dr">0h 0m</b></div><div><span class="lbl">Breaks</span><b id="db">0h 0m</b></div><div><span class="lbl">Sessions</span><b id="dn">0</b></div></div></div>
+ <div class="chips"><span class="lbl">Daily goal</span><span id="gc" class="chips" style="margin:0"></span><input id="gi" type="number" inputmode="decimal" min="0.5" max="24" step="0.5" style="width:84px" aria-label="Goal in hours"></div></div>
+ <div class="card" id="ls"></div>
+</section>
+</main>
+<nav><button data-a="tab" data-v="t"><svg viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9 2h6v2H9zM12 6a8 8 0 1 0 0 16 8 8 0 0 0 0-16zm-1 3h2v5h-2z"/></svg>Timer</button><button data-a="tab" data-v="s"><svg viewBox="0 0 24 24"><path fill-rule="evenodd" d="M5 4h12a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2zm2 2v10.2c.3-.1.6-.2 1-.2h9V6z"/></svg>Study Tracker</button></nav>
+</div>
+<div id="ov" hidden><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 22a2.5 2.5 0 0 0 2.5-2.5h-5A2.5 2.5 0 0 0 12 22zm7-6V11a7 7 0 0 0-5-6.7V3.5a2 2 0 0 0-4 0v.8A7 7 0 0 0 5 11v5l-2 2v1h18v-1z"/></svg></div><h2>Time’s up!</h2><div class="sub" id="ovs"></div><button class="btn p" style="flex:none;width:100%;max-width:320px" data-a="dismiss">Dismiss</button></div>
+<div id="fs" hidden><div class="fsr"><svg viewBox="0 0 220 220"><circle class="trk" cx="110" cy="110" r="100"/><circle id="fsrg" class="prg" cx="110" cy="110" r="100"/></svg><div class="ctr"><div id="fst">00:00</div><div id="fsl">Ready</div></div></div><div id="fsc"></div></div>
+<div id="an" hidden></div>
+<div id="toast"></div>
+<script>
+const $=s=>document.querySelector(s),K='focus_tracker_v1',PRE=[5,10,15,20,30,45,60,90];
+const IC={play:'M8 5v14l11-7z',pause:'M6 5h4v14H6zm8 0h4v14h-4z',reset:'M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z',stop:'M6 6h12v12H6z',coffee:'M4 19h14v2H4zM5 5h11v8a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4zm12 2h1.5a2.5 2.5 0 0 1 0 5H17v-2h1.5a.5.5 0 0 0 0-1H17z'};
+const ic=n=>`<svg viewBox="0 0 24 24"><path d="${IC[n]}"/></svg>`;
+const def=()=>({tab:'t',cd:{st:'idle',dur:1800000,rem:1800000,end:0},study:null,goal:6,sessions:[],subj:''});
+let S;try{S=Object.assign(def(),JSON.parse(localStorage.getItem(K)||'{}'))}catch(e){S=def()}
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}};
+const p2=n=>String(n).padStart(2,'0');
+function fmt(ms,up){const s=Math.max(0,up?Math.ceil(ms/1000):Math.floor(ms/1000)),h=Math.floor(s/3600),m=Math.floor(s%3600/60);return(h?p2(h)+':':'')+p2(m)+':'+p2(s%60)}
+const hm=ms=>{const m=Math.floor(Math.max(0,ms)/60000);return Math.floor(m/60)+'h '+m%60+'m'};
+const ymd=t=>{const d=new Date(t);return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())};
+const tm=t=>new Date(t).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+/* audio */
+let ctx,ai;
+function unlock(){try{ctx=ctx||new(window.AudioContext||window.webkitAudioContext)();ctx.resume()}catch(e){}}
+function beep(){try{[0,.25,.5].forEach(d=>{const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=880;g.gain.value=.25;o.connect(g);g.connect(ctx.destination);o.start(ctx.currentTime+d);o.stop(ctx.currentTime+d+.15)})}catch(e){}try{navigator.vibrate&&navigator.vibrate([300,150,300])}catch(e){}}
+function alarm(on){clearInterval(ai);if(on){beep();ai=setInterval(beep,2200)}}
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),3200)}
+/* countdown */
+const cdRem=()=>S.cd.st=='run'?Math.max(0,S.cd.end-Date.now()):S.cd.rem;
+function pick(sec){if(S.cd.st=='run'||S.cd.st=='pause')return;S.cd={st:'idle',dur:sec*1000,rem:sec*1000,end:0};save();draw()}
+function finish(){S.cd.st='done';S.cd.rem=0;S.cd.end=0;save();$('#ovs').textContent=hm(S.cd.dur)+' countdown finished';$('#ov').hidden=false;alarm(true);draw()}
+/* study */
+const acc=()=>{const s=S.study;if(!s)return null;const n=Date.now(),d=n-s.seg;return{s:s.s+(s.m=='s'?d:0),b:s.b+(s.m=='b'?d:0),t:n-s.start}};
+function mode(m){const s=S.study,d=Date.now()-s.seg;(s.g=s.g||[]).push({m:s.m,a:s.seg,b:Date.now()});if(s.m=='s')s.s+=d;else if(s.m=='b')s.b+=d;s.m=m;s.seg=Date.now();save();draw()}
+let armed=0;
+function endSess(){const a=acc(),n=Date.now(),g=(S.study.g||[]).concat([{m:S.study.m,a:S.study.seg,b:n}]);if(a.s+a.b>=1000)S.sessions.push({id:n,date:ymd(S.study.start),st:S.study.start,en:n,s:a.s,b:a.b,subj:S.study.subj||'',g});S.study=null;armed=0;save();draw()}
+function today(){const k=ymd(Date.now()),l=S.sessions.filter(x=>x.date==k),a=acc();return{l,s:l.reduce((n,x)=>n+x.s,0)+(a?a.s:0),b:l.reduce((n,x)=>n+x.b,0)+(a?a.b:0),n:l.length+(a?1:0)}}
+/* actions */
+const A={
+tab(e){S.tab=e.dataset.v;save();draw()},
+pre(e){pick(+e.dataset.m*60)},
+cset(){const h=+$('#ch').value||0,m=+$('#cm').value||0,s=h*3600+m*60;if(s<60||s>86400)return toast('Enter 1 minute to 24 hours');if(S.cd.st=='run'||S.cd.st=='pause')return toast('Reset the timer first');pick(s);$('#ch').value=$('#cm').value=''},
+cdgo(){unlock();const c=S.cd;if(c.st=='idle'||c.st=='done'){c.rem=c.dur;c.end=Date.now()+c.rem;c.st='run'}else if(c.st=='run'){c.rem=cdRem();c.st='pause'}else{c.end=Date.now()+c.rem;c.st='run'}save();draw()},
+cdreset(){if(S.cd.st=='run')return;S.cd={st:'idle',dur:S.cd.dur,rem:S.cd.dur,end:0};save();draw()},
+dismiss(){alarm(false);$('#ov').hidden=true;S.cd={st:'idle',dur:S.cd.dur,rem:S.cd.dur,end:0};save();draw()},
+sstart(){unlock();const n=Date.now();S.study={start:n,seg:n,m:'s',s:0,b:0,subj:$('#subj').value.trim()};save();draw()},
+sbreak(){mode('b')},spause(){mode('p')},sres(){mode('s')},
+send(){if(!armed){armed=1;draw();setTimeout(()=>{if(armed){armed=0;draw()}},3500)}else endSess()},
+goal(e){S.goal=+e.dataset.g;save();draw()},
+del(e){S.sessions=S.sessions.filter(x=>x.id!=e.dataset.id);save();draw()}
+};
+document.addEventListener('click',ev=>{const e=ev.target.closest('[data-a]');if(e&&A[e.dataset.a])A[e.dataset.a](e)});
+$('#subj').addEventListener('input',e=>{if(S.study){S.study.subj=e.target.value.trim();save()}});
+$('#gi').addEventListener('change',e=>{const v=parseFloat(e.target.value);if(v>=.5&&v<=24){S.goal=v;save();draw()}});
+/* analysis */
+const dur=ms=>{const s=Math.round(ms/1000),h=Math.floor(s/3600),m=Math.floor(s%3600/60);return h?h+'h '+m+'m':m?m+'m '+s%60+'s':s+'s'};
+A.sess=e=>{const x=S.sessions.find(q=>q.id==e.dataset.id);if(!x)return;
+ const tot=Math.max(1,x.en-x.st),pz=Math.max(0,tot-x.s-x.b),rate=Math.round(Math.min(1,x.s/tot)*100),g=x.g||[];
+ const rt=rate>=85?'Excellent':rate>=70?'Good':rate>=50?'Fair':'Needs work';
+ const ins=rate>=85?'Very consistent session with minimal interruptions.':rate>=70?'Solid session. Fewer or shorter breaks can push the focus rate higher.':rate>=50?'Breaks and pauses took a big share of this session.':'Most of this session was not focused study time. Try shorter, more focused sessions.';
+ const col={s:'var(--ac)',b:'var(--wa)',p:'#4b5563'};
+ const it=g.length?g.map(q=>({m:q.m,w:q.b-q.a})):[{m:'s',w:x.s},{m:'b',w:x.b},{m:'p',w:pz}];
+ const tl=it.filter(q=>q.w>0).map(q=>`<i style="width:${q.w/tot*100}%;background:${col[q.m]}"></i>`).join('');
+ const longest=g.filter(q=>q.m=='s').reduce((n,q)=>Math.max(n,q.b-q.a),0),nb=g.filter(q=>q.m=='b').length;
+ const day=S.sessions.filter(q=>q.date==x.date),avg=day.reduce((n,q)=>n+q.s,0)/day.length,d=x.s-avg;
+ const gp=Math.round(x.s/(S.goal*3600000)*100);
+ const kv=(l,v)=>`<div><span>${l}</span><b>${v}</b></div>`;
+ $('#an').innerHTML=`<div class="sh"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div style="min-width:0"><h1>Session analysis</h1><div style="font-size:21px;font-weight:700;margin-top:4px">${esc(x.subj||'Study session')}</div><div class="sub">${new Date(x.st).toLocaleDateString([],{weekday:'short',day:'numeric',month:'short',year:'numeric'})} · ${tm(x.st)} – ${tm(x.en)}</div></div><button class="x" data-a="anx" aria-label="Close">×</button></div>
+<div class="card" style="margin:14px 0"><div style="display:flex;justify-content:space-between;align-items:flex-end"><div><span class="lbl">Focused time</span><div style="font-size:38px;font-weight:700;font-variant-numeric:tabular-nums">${fmt(x.s)}</div></div><div style="text-align:right"><span class="lbl">Focus rate</span><div style="font-size:30px;font-weight:700;color:var(--ac)">${rate}%</div><div class="sub">${rt}</div></div></div><div class="bar" style="margin-top:12px"><i style="width:${rate}%"></i></div><div class="sub" style="margin-top:10px">${ins}</div></div>
+<div class="lbl" style="margin-bottom:8px">Session timeline</div><div class="tl">${tl}</div>
+<div style="display:flex;gap:16px;margin:8px 0 14px;font-size:12px;color:var(--mu)"><span><b style="color:var(--ac)">●</b> Focus</span><span><b style="color:var(--wa)">●</b> Break</span><span><b style="color:#4b5563">●</b> Paused</span></div>
+<div class="kv">${kv('Total duration',dur(tot))}${kv('Focused',dur(x.s))}${kv('Break time',dur(x.b))}${kv('Paused time',dur(pz))}${kv('Breaks taken',g.length?nb:'—')}${kv('Longest focus stretch',g.length?dur(longest):'—')}${kv('Share of daily goal',gp+'%')}${kv('vs today’s avg focus',day.length>1?(d>=0?'+':'−')+dur(Math.abs(d)):'—')}</div></div>`;
+ $('#an').hidden=false};
+A.anx=()=>{$('#an').hidden=true};
+$('#an').addEventListener('click',e=>{if(e.target.id=='an')A.anx()});
+/* fullscreen */
+let fsC='',fsT='',wlk,ht;
+async function wl(){try{if(navigator.wakeLock&&!$('#fs').hidden)wlk=await navigator.wakeLock.request('screen')}catch(e){}}
+function showCtl(){const e=$('#fs');e.classList.add('show');clearTimeout(ht);ht=setTimeout(()=>e.classList.remove('show'),3500)}
+A.fs=()=>{unlock();$('#fs').hidden=false;fsC='';fsT='';try{const e=document.documentElement,r=(e.requestFullscreen||e.webkitRequestFullscreen).call(e);r&&r.catch&&r.catch(()=>{})}catch(e){}wl();fsPaint();showCtl()};
+A.fsx=()=>{$('#fs').hidden=true;try{wlk&&wlk.release();wlk=null}catch(e){}try{if(document.fullscreenElement)document.exitFullscreen()}catch(e){}};
+$('#fs').addEventListener('click',ev=>{const e=$('#fs');if(ev.target.closest('button'))showCtl();else if(e.classList.contains('show')){clearTimeout(ht);e.classList.remove('show')}else showCtl()});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)wl()});
+function fsPaint(){
+ const el=$('#fs');if(el.hidden)return;
+ const c=S.cd,s=S.study,a=acc();let txt,lab,col='var(--tx)',pr,run,key,b;
+ if(S.tab=='t'){const r=cdRem();txt=fmt(r,true);lab={idle:'Ready',run:'Counting down',pause:'Paused',done:'Finished'}[c.st];run=c.st=='run';if(run)col='var(--ac)';pr=c.dur?r/c.dur:0;key='t'+c.st;b=`<button class="btn p" data-a="cdgo">${ic(run?'pause':'play')}${run?'Pause':c.st=='pause'?'Resume':'Start'}</button>`}
+ else{const br=s&&s.m=='b';txt=fmt(a?(br?a.b:a.s):0);lab=!s?'Ready':s.m=='s'?'Studying':br?'On break':'Paused';run=!!s&&s.m!='p';col=!s||s.m=='p'?'var(--tx)':br?'var(--wa)':'var(--ac)';pr=Math.min(1,today().s/(S.goal*3600000));key='s'+(s?s.m:'');b=!s?`<button class="btn p" data-a="sstart">${ic('play')}Start</button>`:s.m=='s'?`<button class="btn w" data-a="sbreak">${ic('coffee')}Break</button><button class="btn" data-a="spause">${ic('pause')}Pause</button>`:`<button class="btn p" data-a="sres">${ic('play')}Resume</button>`}
+ if(key!=fsC){fsC=key;$('#fsc').innerHTML=b+'<button class="btn" data-a="fsx">Exit</button>'}
+ if(txt!=fsT){fsT=txt;const f=$('#fst');f.textContent=txt;f.className=txt.length>5?'h':''}
+ $('#fsl').textContent=lab;$('#fsrg').style.strokeDashoffset=628.3*(1-pr);el.classList.toggle('run',!!run)
+}
+/* render */
+function draw(){
+ const c=S.cd,lock=c.st=='run'||c.st=='pause';
+ $('#t').hidden=S.tab!='t';$('#s').hidden=S.tab!='s';
+ document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v==S.tab));
+ $('#pg').innerHTML=PRE.map(m=>`<button class="pre${c.dur==m*60000?' on':''}" data-a="pre" data-m="${m}" ${lock?'disabled':''}>${m}<small>min</small></button>`).join('');
+ $('#cc').innerHTML=`<button class="btn p" data-a="cdgo">${ic(c.st=='run'?'pause':'play')}${c.st=='run'?'Pause':c.st=='pause'?'Resume':'Start'}</button><button class="btn" data-a="cdreset" ${c.st=='run'||c.st=='idle'&&c.rem==c.dur?'disabled':''}>${ic('reset')}Reset</button>`;
+ const s=S.study,m=s&&s.m;
+ const chip=$('#chip');chip.className='chipx '+(m=='s'?'st-s':m=='b'?'st-b':'');
+ chip.lastChild.textContent=m=='s'?'Studying':m=='b'?'On Break':m=='p'?'Paused':'Ready';
+ let h='';
+ if(!s)h=`<button class="btn p full" data-a="sstart">${ic('play')}Start Study</button>`;
+ else{
+  h=m=='s'?`<button class="btn w" data-a="sbreak">${ic('coffee')}Take Break</button><button class="btn" data-a="spause">${ic('pause')}Pause</button>`:`<button class="btn p full" data-a="sres">${ic('play')}${m=='b'?'Resume Study':'Resume'}</button>`;
+  h+=`<button class="btn d full" data-a="send">${ic('stop')}${armed?'Tap again to end':'End Session'}</button>`;
+ }
+ $('#sc').innerHTML=h;
+ if(s&&document.activeElement!=$('#subj'))$('#subj').value=s.subj||'';
+ $('#gc').innerHTML=[4,6,8,10].map(g=>`<button class="chip${S.goal==g?' on':''}" data-a="goal" data-g="${g}">${g}h</button>`).join('');
+ if(document.activeElement!=$('#gi'))$('#gi').value=S.goal;
+ const L=today().l.slice().reverse();
+ $('#ls').innerHTML=`<div class="lbl" style="margin-bottom:4px">Today’s sessions · tap for analysis</div>`+(L.length?L.map(x=>`<div class="row" data-a="sess" data-id="${x.id}" style="cursor:pointer"><div><b>${esc(x.subj||'Study session')}</b><small>${tm(x.st)} – ${tm(x.en)} · break ${hm(x.b)}</small></div><b style="flex:none;color:var(--ac)">${hm(x.s)}</b><button class="x" data-a="del" data-id="${x.id}" aria-label="Delete">×</button></div>`).join(''):'<div class="sub" style="padding:8px 0">No completed sessions yet.</div>');
+ paint();
+}
+function paint(){
+ const c=S.cd,r=cdRem();
+ $('#ct').textContent=fmt(r,true);
+ $('#cr').style.strokeDashoffset=628.3*(1-(c.dur?r/c.dur:0));
+ $('#cs').textContent={idle:'Ready',run:'Counting down',pause:'Paused',done:'Finished'}[c.st];
+ const a=acc();
+ if(a){$('#sf').textContent=fmt(a.s);$('#sff').textContent=fmt(a.s);$('#sb').textContent=fmt(a.b);$('#stt').textContent=fmt(a.t)}
+ else{$('#sf').textContent='00:00';$('#sff').textContent='00:00';$('#sb').textContent='00:00';$('#stt').textContent='00:00'}
+ const t=today(),g=S.goal*3600000,p=Math.min(1,t.s/g);
+ $('#df').textContent=hm(t.s);$('#dr').textContent=hm(g-t.s);$('#db').textContent=hm(t.b);$('#dn').textContent=t.n;
+ $('#dpct').textContent=Math.floor(p*100)+'%';$('#dring').style.strokeDashoffset=276.5*(1-p);
+ if(S.study)document.title=(S.study.m=='s'?'● ':'')+fmt(a.s)+' · Focus';else document.title=c.st=='run'?fmt(r,true)+' · Focus':'Focus Timer';fsPaint();
+}
+function tick(){if(S.cd.st=='run'&&cdRem()<=0)finish();else paint()}
+setInterval(tick,250);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick()});
+/* PWA */
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+/* boot */
+draw();
+if(S.cd.st=='run'&&cdRem()<=0)finish();
+else if(S.cd.st=='done'){$('#ov').hidden=false;$('#ovs').textContent=hm(S.cd.dur)+' countdown finished'}
+else if(S.study||S.cd.st=='run'||S.cd.st=='pause')toast('Active session restored');
+</script></body></html>
