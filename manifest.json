@@ -1,1 +1,43 @@
-{"id":"./","name":"Focus Timer & Study Tracker","short_name":"Focus","description":"Countdown timer and study hour tracker","start_url":"./","scope":"./","display":"standalone","orientation":"any","background_color":"#0e1013","theme_color":"#0e1013","icons":[{"src":"icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},{"src":"icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},{"src":"icons/icon-maskable-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}]}
+{
+  "id": "./",
+  "name": "Focus Timer &amp; Study Tracker",
+  "short_name": "Focus Timer",
+  "description": "Countdown timer and study hour tracker",
+  "start_url": "https://j4jack1511.github.io/Focus-Timer/",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "natural",
+  "background_color": "#0e1013",
+  "theme_color": "#0e1013",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "lang": "en",
+  "display_override": [
+    "window-controls-overlay",
+    "fullscreen"
+  ],
+  "categories": [
+    "education",
+    "fitness",
+    "lifestyle",
+    "personalization"
+  ]
+}
